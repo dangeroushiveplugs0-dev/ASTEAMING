@@ -17,7 +17,7 @@ button{font:inherit;color:inherit;background:#252a31;border:1px solid #3a414b;bo
 #mainMenu{display:none!important}.menuTitle{font-size:26px;font-weight:800;margin-bottom:4px}.menuSub{color:#9da5af;margin-bottom:22px}
 .projectList{max-height:45vh;overflow:auto}.projectCard{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #343b45;border-radius:10px;margin-bottom:10px}.projectCard .info{flex:1}.empty{padding:18px;text-align:center;color:#9da5af;border:1px dashed #3d454f;border-radius:10px}
 #soundPanel{position:fixed;right:10px;top:58px;width:min(330px,calc(100% - 20px));max-height:calc(100% - 285px);overflow:auto;background:rgba(24,27,32,.97);border:1px solid #3a414b;border-radius:12px;padding:10px;z-index:40;display:none}.folder{margin:8px 0;padding:10px;border:1px solid #3f4853;border-radius:10px}.folderTitle{font-weight:700;margin-bottom:8px}.soundItem{display:flex;align-items:center;gap:7px;padding:8px;border-bottom:1px solid #2f353d}.soundItem span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}#soundInput{display:none}
-#status{position:fixed;left:10px;bottom:220px;padding:6px 9px;border-radius:6px;background:rgba(0,0,0,.65);color:#fff;font:12px monospace;z-index:50}
+#status{display:none;position:fixed;left:10px;bottom:220px;padding:6px 9px;border-radius:6px;background:rgba(0,0,0,.65);color:#fff;font:12px monospace;z-index:50}
 </style>
 </head>
 <body>
@@ -28,7 +28,7 @@ button{font:inherit;color:inherit;background:#252a31;border:1px solid #3a414b;bo
   <div style="margin:8px 0;color:#9da5af;font-size:12px">Stored inside this project, not linked to the phone filesystem.</div>
   <div class="folder"><div class="folderTitle">📁 SFX</div><button id="addSound">＋ Import SFX</button><input id="soundInput" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.aac,.flac"><div id="soundList"></div></div>
 </div>
-<div id="status">ASTEAMING starting...</div>
+<div id="status" aria-hidden="true"></div>
 <div id="timeline"><div id="timelineHead"><button id="play">▶</button><button id="stop">■</button><button id="prev">◀</button><button id="next">▶</button><span id="timecode">00:00:00:00</span><span style="margin-left:auto;font-size:11px;color:#9da5af">30 FPS</span></div><div id="timelineBody"><div id="tracks"></div><div id="timelineScroll"><div id="ruler"></div><div id="rows"></div><div id="playhead"></div></div></div></div>
 
 <script type="importmap">{"imports":{"three":"./libs/three/build/three.module.js","three/addons/":"./libs/three/examples/jsm/","three-viewport-gizmo":"./libs/three-viewport-gizmo/dist/three-viewport-gizmo.js"}}</script>
@@ -45,7 +45,7 @@ import {AudioTimeline} from './src/asteaming/audio/AudioTimeline.js';
 const $=id=>document.getElementById(id), status=$('status'), store=new ProjectStore(), audio=new AudioEngine(), timeline=new TimelineModel({fps:30}), audioTimeline=new AudioTimeline();
 let sounds=[], currentProject=null;
 const controller=new TimelineController(timeline,{onTimeChange:renderTimeline,onPlayStateChange:playing=>{$('play').textContent=playing?'Ⅱ':'▶';if(playing)scheduleAudio();else audio.stopAll();}});
-function showError(e){status.textContent='Error: '+(e?.message||e);status.style.background='rgba(120,0,0,.8)';console.error(e)}
+function showError(e){status.textContent='Error: '+(e?.message||e);status.style.display='block';status.style.background='rgba(120,0,0,.8)';console.error(e)}
 function timecode(t){const f=Math.floor(t*30),s=Math.floor(f/30),m=Math.floor(s/60);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+':'+String(f%30).padStart(2,'0')}
 function renderTimeline(){ $('timecode').textContent=timecode(timeline.current); $('playhead').style.left=(timeline.current*90)+'px'; document.querySelectorAll('.clip').forEach(el=>{const c=el._clip;el.style.left=(c.start*90)+'px';el.style.width=Math.max(24,c.duration*90)+'px'})}
 function buildTimeline(){
