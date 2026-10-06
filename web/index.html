@@ -59,7 +59,6 @@ function refreshSounds(){
  $('soundList').innerHTML='';
  for(const sound of sounds){const row=document.createElement('div');row.className='soundItem';const name=document.createElement('span');name.textContent=sound.name;const add=document.createElement('button');add.textContent='Add to timeline';add.onclick=()=>{const track=audioTimeline.tracks[0]||audioTimeline.addTrack();const clip=audioTimeline.addClip(track,sound,timeline.current,{duration:sound.duration||5});const modelTrack=timeline.tracks.find(t=>t.kind==='audio');modelTrack.clips=modelTrack.clips||[];modelTrack.clips.push(clip);timeline.end=Math.max(timeline.end,timeline.current+clip.duration+1);buildTimeline()};row.append(name,add);$('soundList').appendChild(row)}
 }
-$('mainMenu').style.display='flex'};
 $('soundsBtn').onclick=()=>{$('soundPanel').style.display=$('soundPanel').style.display==='none'?'block':'none'};
 $('addSound').onclick=()=>$('soundInput').click();
 $('soundInput').onchange=async e=>{try{if(!currentProject)throw new Error('Open a project first');for(const file of e.target.files||[])sounds.push(await store.putSound(file,file.name,'SFX'));refreshSounds();$('soundPanel').style.display='block';e.target.value=''}catch(err){showError(err)}};
@@ -74,6 +73,6 @@ try{
  let projects=await store.listProjects();
  if(!projects.length){currentProject=await store.createProject('Untitled Project')}
  else {const active=await store.getProject();currentProject=active||projects[0];await store.openProject(currentProject.id)}
- $('projectTitle').textContent=currentProject.name;sounds=await store.listSounds('SFX');refreshSounds();buildTimeline();await renderProjects();status.textContent='Ready'
+ $('projectTitle').textContent=currentProject.name;sounds=await store.listSounds('SFX');refreshSounds();buildTimeline();status.textContent='Ready'
 }catch(e){showError(e)}
 </script></body></html>
