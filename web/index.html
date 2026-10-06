@@ -4,89 +4,38 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111317;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
-button{font:inherit;color:inherit;background:#252a31;border:1px solid #3a414b;border-radius:8px;padding:9px 12px}
-button:active{transform:scale(.98)}
-#viewport{position:fixed;inset:0 0 210px}
-canvas{display:block;width:100%;height:100%;touch-action:none}
-#topbar{position:fixed;left:0;right:0;top:0;height:48px;display:flex;align-items:center;gap:8px;padding:6px 9px;background:rgba(16,18,22,.88);z-index:20;backdrop-filter:blur(10px)}
-#topbar .title{font-weight:700;margin-right:auto}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111317;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
+button{font:inherit;color:inherit;background:#252a31;border:1px solid #3a414b;border-radius:8px;padding:9px 12px}button:active{transform:scale(.98)}
+#viewport{position:fixed;inset:0 0 210px}canvas{display:block;width:100%;height:100%;touch-action:none}
+#topbar{position:fixed;left:0;right:0;top:0;height:48px;display:flex;align-items:center;gap:8px;padding:6px 9px;background:rgba(16,18,22,.88);z-index:20;backdrop-filter:blur(10px)}#topbar .title{font-weight:700;margin-right:auto}
 #timeline{position:fixed;left:0;right:0;bottom:0;height:210px;background:#171a1f;border-top:1px solid #303640;z-index:30;display:flex;flex-direction:column}
-#timelineHead{height:42px;display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #303640}
-#timecode{font-variant-numeric:tabular-nums;min-width:86px;text-align:center}
-#timelineBody{position:relative;display:flex;flex:1;min-height:0;overflow:hidden}
-#tracks{width:118px;flex:none;background:#1d2127;border-right:1px solid #303640;padding-top:27px}
-.trackLabel{height:40px;padding:10px 8px;border-bottom:1px solid #2b3038;font-size:12px;white-space:nowrap;overflow:hidden}
-#timelineScroll{position:relative;overflow:auto;flex:1;touch-action:none}
-#ruler{height:27px;position:relative;border-bottom:1px solid #303640;min-width:900px}
-.tick{position:absolute;top:0;height:27px;border-left:1px solid #39404a;font-size:9px;padding-left:3px;color:#9da5af}
-.row{height:40px;position:relative;min-width:900px;border-bottom:1px solid #2b3038}
-.clip{position:absolute;top:5px;height:30px;border-radius:6px;padding:6px 8px;background:#354b62;border:1px solid #5b7896;font-size:11px;overflow:hidden;white-space:nowrap;touch-action:none}
-.clip.audio{background:#493b57;border-color:#8065a0}
-.key{position:absolute;top:14px;width:12px;height:12px;transform:rotate(45deg);background:#d9d9d9;border-radius:2px}
-#playhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;z-index:8;pointer-events:none}
-#playhead::before{content:"";position:absolute;top:0;left:-5px;width:12px;height:12px;background:#fff;border-radius:50%}
-#mainMenu{position:fixed;inset:0;background:#111317;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
-.menuCard{width:min(520px,100%);background:#1b1f25;border:1px solid #343b45;border-radius:16px;padding:22px}
-.menuTitle{font-size:26px;font-weight:800;margin-bottom:4px}
-.menuSub{color:#9da5af;margin-bottom:22px}
-.projectCard{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #343b45;border-radius:10px;margin-bottom:10px}
-.projectCard .info{flex:1}
-.folder{margin-top:18px;padding:14px;border:1px dashed #48515d;border-radius:10px}
-#soundPanel{position:fixed;right:10px;top:58px;width:min(310px,calc(100% - 20px));max-height:calc(100% - 285px);overflow:auto;background:rgba(24,27,32,.96);border:1px solid #3a414b;border-radius:12px;padding:10px;z-index:40;display:none}
-.soundItem{display:flex;align-items:center;gap:7px;padding:8px;border-bottom:1px solid #2f353d}
-.soundItem span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
-#soundInput{display:none}
+#timelineHead{height:42px;display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #303640}#timecode{font-variant-numeric:tabular-nums;min-width:86px;text-align:center}
+#timelineBody{position:relative;display:flex;flex:1;min-height:0;overflow:hidden}#tracks{width:118px;flex:none;background:#1d2127;border-right:1px solid #303640;padding-top:27px}.trackLabel{height:40px;padding:10px 8px;border-bottom:1px solid #2b3038;font-size:12px;white-space:nowrap;overflow:hidden}
+#timelineScroll{position:relative;overflow:auto;flex:1;touch-action:none}#ruler{height:27px;position:relative;border-bottom:1px solid #303640;min-width:900px}.tick{position:absolute;top:0;height:27px;border-left:1px solid #39404a;font-size:9px;padding-left:3px;color:#9da5af}.row{height:40px;position:relative;min-width:900px;border-bottom:1px solid #2b3038}
+.clip{position:absolute;top:5px;height:30px;border-radius:6px;padding:6px 8px;background:#354b62;border:1px solid #5b7896;font-size:11px;overflow:hidden;white-space:nowrap;touch-action:none}.clip.audio{background:#493b57;border-color:#8065a0}.key{position:absolute;top:14px;width:12px;height:12px;transform:rotate(45deg);background:#d9d9d9;border-radius:2px}
+#playhead{position:absolute;top:0;bottom:0;width:2px;background:#fff;z-index:8;pointer-events:none}#playhead:before{content:"";position:absolute;top:0;left:-5px;width:12px;height:12px;background:#fff;border-radius:50%}
+#mainMenu{position:fixed;inset:0;background:#111317;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}.menuCard{width:min(520px,100%);background:#1b1f25;border:1px solid #343b45;border-radius:16px;padding:22px}.menuTitle{font-size:26px;font-weight:800;margin-bottom:4px}.menuSub{color:#9da5af;margin-bottom:22px}
+.projectList{max-height:45vh;overflow:auto}.projectCard{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid #343b45;border-radius:10px;margin-bottom:10px}.projectCard .info{flex:1}.empty{padding:18px;text-align:center;color:#9da5af;border:1px dashed #3d454f;border-radius:10px}
+#soundPanel{position:fixed;right:10px;top:58px;width:min(330px,calc(100% - 20px));max-height:calc(100% - 285px);overflow:auto;background:rgba(24,27,32,.97);border:1px solid #3a414b;border-radius:12px;padding:10px;z-index:40;display:none}.folder{margin:8px 0;padding:10px;border:1px solid #3f4853;border-radius:10px}.folderTitle{font-weight:700;margin-bottom:8px}.soundItem{display:flex;align-items:center;gap:7px;padding:8px;border-bottom:1px solid #2f353d}.soundItem span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}#soundInput{display:none}
 #status{position:fixed;left:10px;bottom:220px;padding:6px 9px;border-radius:6px;background:rgba(0,0,0,.65);color:#fff;font:12px monospace;z-index:50}
 </style>
 </head>
 <body>
-<div id="mainMenu">
-  <div class="menuCard">
-    <div class="menuTitle">ASTEAMING</div>
-    <div class="menuSub">Rigging • Animation • Physics</div>
-    <div class="projectCard">
-      <div class="info"><b>Untitled Project</b><br><small>Animation project</small></div>
-      <button id="openProject">Open</button>
-    </div>
-    <button id="newProject">＋ New Project</button>
-  </div>
-</div>
+<div id="mainMenu"><div class="menuCard">
+  <div class="menuTitle">ASTEAMING</div><div class="menuSub">Rigging • Animation • Physics</div>
+  <div id="projectList" class="projectList"></div>
+  <button id="newProject">＋ New Project</button>
+</div></div>
 
-<div id="topbar">
-  <button id="menuBtn">☰</button>
-  <div class="title">Untitled Project</div>
-  <button id="soundsBtn">Sounds</button>
-</div>
+<div id="topbar"><button id="menuBtn">☰</button><div id="projectTitle" class="title">Untitled Project</div><button id="soundsBtn">Sounds</button></div>
 <div id="viewport"></div>
 <div id="soundPanel">
   <b>Project / Sounds</b>
-  <div style="margin:8px 0;color:#9da5af;font-size:12px">Sounds are stored inside this project.</div>
-  <button id="addSound">＋ Import sound</button>
-  <input id="soundInput" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.aac,.flac">
-  <div id="soundList"></div>
+  <div style="margin:8px 0;color:#9da5af;font-size:12px">Stored inside this project, not linked to the phone filesystem.</div>
+  <div class="folder"><div class="folderTitle">📁 SFX</div><button id="addSound">＋ Import SFX</button><input id="soundInput" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.aac,.flac"><div id="soundList"></div></div>
 </div>
 <div id="status">ASTEAMING starting...</div>
-
-<div id="timeline">
-  <div id="timelineHead">
-    <button id="play">▶</button>
-    <button id="stop">■</button>
-    <button id="prev">◀</button>
-    <button id="next">▶</button>
-    <span id="timecode">00:00:00:00</span>
-    <span style="margin-left:auto;font-size:11px;color:#9da5af">30 FPS</span>
-  </div>
-  <div id="timelineBody">
-    <div id="tracks"></div>
-    <div id="timelineScroll">
-      <div id="ruler"></div>
-      <div id="rows"></div>
-      <div id="playhead"></div>
-    </div>
-  </div>
-</div>
+<div id="timeline"><div id="timelineHead"><button id="play">▶</button><button id="stop">■</button><button id="prev">◀</button><button id="next">▶</button><span id="timecode">00:00:00:00</span><span style="margin-left:auto;font-size:11px;color:#9da5af">30 FPS</span></div><div id="timelineBody"><div id="tracks"></div><div id="timelineScroll"><div id="ruler"></div><div id="rows"></div><div id="playhead"></div></div></div></div>
 
 <script type="importmap">{"imports":{"three":"./libs/three/build/three.module.js","three/addons/":"./libs/three/examples/jsm/","three-viewport-gizmo":"./libs/three-viewport-gizmo/dist/three-viewport-gizmo.js"}}</script>
 <script type="module">
@@ -99,150 +48,46 @@ import {TimelineModel} from './src/asteaming/timeline/TimelineModel.js';
 import {TimelineController} from './src/asteaming/timeline/TimelineController.js';
 import {AudioTimeline} from './src/asteaming/audio/AudioTimeline.js';
 
-const $=id=>document.getElementById(id);
-const status=$('status');
-const store=new ProjectStore();
-const audio=new AudioEngine();
-const timeline=new TimelineModel({fps:30});
-const audioTimeline=new AudioTimeline();
-const controller=new TimelineController(timeline,{onTimeChange:renderTimeline,onPlayStateChange:playing=>{
-  $('play').textContent=playing?'Ⅱ':'▶';
-  if(playing) scheduleAudio();
-  else audio.stopAll();
-}});
-let sounds=[];
-
+const $=id=>document.getElementById(id), status=$('status'), store=new ProjectStore(), audio=new AudioEngine(), timeline=new TimelineModel({fps:30}), audioTimeline=new AudioTimeline();
+let sounds=[], currentProject=null;
+const controller=new TimelineController(timeline,{onTimeChange:renderTimeline,onPlayStateChange:playing=>{$('play').textContent=playing?'Ⅱ':'▶';if(playing)scheduleAudio();else audio.stopAll();}});
 function showError(e){status.textContent='Error: '+(e?.message||e);status.style.background='rgba(120,0,0,.8)';console.error(e)}
 function timecode(t){const f=Math.floor(t*30),s=Math.floor(f/30),m=Math.floor(s/60);return String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+':'+String(f%30).padStart(2,'0')}
-function renderTimeline(){
-  $('timecode').textContent=timecode(timeline.current);
-  const pxPerSecond=90;
-  const x=timeline.current*pxPerSecond;
-  $('playhead').style.left=x+'px';
-  document.querySelectorAll('.clip').forEach(el=>{
-    const c=el._clip;
-    el.style.left=(c.start*pxPerSecond)+'px';
-    el.style.width=Math.max(24,c.duration*pxPerSecond)+'px';
-  });
-}
+function renderTimeline(){ $('timecode').textContent=timecode(timeline.current); $('playhead').style.left=(timeline.current*90)+'px'; document.querySelectorAll('.clip').forEach(el=>{const c=el._clip;el.style.left=(c.start*90)+'px';el.style.width=Math.max(24,c.duration*90)+'px'})}
 function buildTimeline(){
-  $('tracks').innerHTML='';
-  $('rows').innerHTML='';
-  $('ruler').innerHTML='';
-  for(let s=0;s<=timeline.end;s++){
-    const tick=document.createElement('div');tick.className='tick';tick.style.left=(s*90)+'px';tick.textContent=s+'s';$('ruler').appendChild(tick);
-  }
-  const tracks=[...timeline.tracks];
-  if(!tracks.length){
-    timeline.addTrack('animation','Animation');
-    timeline.addTrack('audio','Sound FX / Music');
-  }
-  timeline.tracks.forEach(track=>{
-    const label=document.createElement('div');label.className='trackLabel';label.textContent=track.name;$('tracks').appendChild(label);
-    const row=document.createElement('div');row.className='row';row.dataset.track=track.id;
-    for(const item of track.items||[]){
-      if(item.frame==null) continue;
-      const key=document.createElement('div');key.className='key';key.style.left=(item.frame/30*90-5)+'px';row.appendChild(key);
-    }
-    for(const clip of track.clips||[]){
-      const el=document.createElement('div');el.className='clip '+(track.kind==='audio'?'audio':'');el.textContent=clip.name;el._clip=clip;row.appendChild(el);
-    }
-    $('rows').appendChild(row);
-  });
-  renderTimeline();
+ $('tracks').innerHTML='';$('rows').innerHTML='';$('ruler').innerHTML='';
+ if(!timeline.tracks.length){timeline.addTrack('animation','Animation');timeline.addTrack('audio','Sound FX / Music')}
+ for(let s=0;s<=timeline.end;s++){const tick=document.createElement('div');tick.className='tick';tick.style.left=s*90+'px';tick.textContent=s+'s';$('ruler').appendChild(tick)}
+ timeline.tracks.forEach(track=>{const label=document.createElement('div');label.className='trackLabel';label.textContent=track.name;$('tracks').appendChild(label);const row=document.createElement('div');row.className='row';row.dataset.track=track.id;for(const item of track.items||[]){if(item.frame==null)continue;const key=document.createElement('div');key.className='key';key.style.left=(item.frame/30*90-5)+'px';row.appendChild(key)}for(const clip of track.clips||[]){const el=document.createElement('div');el.className='clip '+(track.kind==='audio'?'audio':'');el.textContent=clip.name;el._clip=clip;row.appendChild(el)}$('rows').appendChild(row)});renderTimeline();
 }
-function scheduleAudio(){
-  audio.stopAll();
-  const now=timeline.current;
-  const track=audioTimeline.tracks[0];
-  if(!track) return;
-  for(const clip of track.clips){
-    const end=clip.start+clip.duration;
-    if(end<=now) continue;
-    const offset=Math.max(0,now-clip.start)+clip.sourceOffset;
-    const delay=Math.max(0,clip.start-now);
-    const asset=sounds.find(x=>x.id===clip.assetId);
-    if(asset) audio.playClip(asset,delay,offset,clip.duration-Math.max(0,now-clip.start),clip.volume).catch(showError);
-  }
-}
+function scheduleAudio(){audio.stopAll();const now=timeline.current,track=audioTimeline.tracks[0];if(!track)return;for(const clip of track.clips){const end=clip.start+clip.duration;if(end<=now)continue;const offset=Math.max(0,now-clip.start)+clip.sourceOffset,delay=Math.max(0,clip.start-now),asset=sounds.find(x=>x.id===clip.assetId);if(asset)audio.playClip({...asset,source:asset.blob},delay,offset,clip.duration-Math.max(0,now-clip.start),clip.volume).catch(showError)}}
 function refreshSounds(){
-  $('soundList').innerHTML='';
-  for(const sound of sounds){
-    const row=document.createElement('div');row.className='soundItem';
-    const name=document.createElement('span');name.textContent=sound.name;
-    const add=document.createElement('button');add.textContent='Add';
-    add.onclick=()=>{
-      const track=audioTimeline.tracks[0]||audioTimeline.addTrack();
-      audioTimeline.addClip(track,sound,timeline.current,{duration:5});
-      const modelTrack=timeline.tracks.find(t=>t.kind==='audio');
-      modelTrack.items.push({type:'audio',clipId:track.clips.at(-1).id});
-      timeline.end=Math.max(timeline.end,timeline.current+track.clips.at(-1).duration+1);
-      buildTimeline();
-    };
-    row.append(name,add);$('soundList').appendChild(row);
-  }
+ $('soundList').innerHTML='';
+ for(const sound of sounds){const row=document.createElement('div');row.className='soundItem';const name=document.createElement('span');name.textContent=sound.name;const add=document.createElement('button');add.textContent='Add to timeline';add.onclick=()=>{const track=audioTimeline.tracks[0]||audioTimeline.addTrack();const clip=audioTimeline.addClip(track,sound,timeline.current,{duration:sound.duration||5});const modelTrack=timeline.tracks.find(t=>t.kind==='audio');modelTrack.clips=modelTrack.clips||[];modelTrack.clips.push(clip);timeline.end=Math.max(timeline.end,timeline.current+clip.duration+1);buildTimeline()};row.append(name,add);$('soundList').appendChild(row)}
 }
-
-$('openProject').onclick=()=>{$('mainMenu').style.display='none';status.textContent='Project ready';setTimeout(()=>status.style.display='none',1200)};
-$('newProject').onclick=async()=>{await store.putProject({name:'Untitled Project'});$('mainMenu').style.display='none';status.textContent='New project created';setTimeout(()=>status.style.display='none',1200)};
-$('menuBtn').onclick=()=>{$('mainMenu').style.display='flex'};
+async function openProject(project){
+ try{currentProject=await store.openProject(project.id);$('projectTitle').textContent=currentProject.name;$('soundPanel').style.display='none';$('mainMenu').style.display='none';sounds=await store.listSounds('SFX');refreshSounds();status.textContent='Opened '+currentProject.name;setTimeout(()=>status.style.display='none',1200)}catch(e){showError(e)}
+}
+async function renderProjects(){
+ const projects=await store.listProjects();$('projectList').innerHTML='';
+ if(!projects.length){const e=document.createElement('div');e.className='empty';e.textContent='No projects yet. Create your first project.';$('projectList').appendChild(e);return}
+ for(const p of projects){const card=document.createElement('div');card.className='projectCard';const info=document.createElement('div');info.className='info';info.innerHTML='<b></b><br><small>Animation project</small>';info.querySelector('b').textContent=p.name;const open=document.createElement('button');open.textContent='Open';open.onclick=()=>openProject(p);card.append(info,open);$('projectList').appendChild(card)}
+}
+$('newProject').onclick=async()=>{try{const name=prompt('Project name','Untitled Project');if(name===null)return;const project=await store.createProject(name);await openProject(project)}catch(e){showError(e)}};
+$('menuBtn').onclick=async()=>{await renderProjects();$('mainMenu').style.display='flex'};
 $('soundsBtn').onclick=()=>{$('soundPanel').style.display=$('soundPanel').style.display==='none'?'block':'none'};
 $('addSound').onclick=()=>$('soundInput').click();
-$('soundInput').onchange=async e=>{
-  for(const file of e.target.files||[]){
-    const rec=await store.putSound(file);
-    sounds.push(rec);
-  }
-  refreshSounds();
-  $('soundPanel').style.display='block';
-  e.target.value='';
-};
-$('play').onclick=()=>controller.togglePlay();
-$('stop').onclick=()=>{controller.pause();controller.setTime(timeline.start)};
-$('prev').onclick=()=>controller.setTime(Math.max(timeline.start,timeline.current-1/30));
-$('next').onclick=()=>controller.setTime(Math.min(timeline.end,timeline.current+1/30));
-
-$('timelineScroll').addEventListener('pointerdown',e=>{
-  const rect=$('timelineScroll').getBoundingClientRect();
-  controller.setTime(Math.max(0,(e.clientX-rect.left+e.currentTarget.scrollLeft)/90));
-});
-$('timelineScroll').addEventListener('pointermove',e=>{
-  if(e.buttons) {
-    const rect=$('timelineScroll').getBoundingClientRect();
-    controller.setTime(Math.max(0,(e.clientX-rect.left+e.currentTarget.scrollLeft)/90));
-  }
-});
-
+$('soundInput').onchange=async e=>{try{if(!currentProject)throw new Error('Open a project first');for(const file of e.target.files||[])sounds.push(await store.putSound(file,file.name,'SFX'));refreshSounds();$('soundPanel').style.display='block';e.target.value=''}catch(err){showError(err)}};
+$('play').onclick=()=>controller.togglePlay();$('stop').onclick=()=>{controller.pause();controller.setTime(timeline.start)};$('prev').onclick=()=>controller.setTime(Math.max(timeline.start,timeline.current-1/30));$('next').onclick=()=>controller.setTime(Math.min(timeline.end,timeline.current+1/30));
+$('timelineScroll').addEventListener('pointerdown',e=>{const r=$('timelineScroll').getBoundingClientRect();controller.setTime(Math.max(0,(e.clientX-r.left+e.currentTarget.scrollLeft)/90))});
+$('timelineScroll').addEventListener('pointermove',e=>{if(e.buttons){const r=$('timelineScroll').getBoundingClientRect();controller.setTime(Math.max(0,(e.clientX-r.left+e.currentTarget.scrollLeft)/90))}});
 try{
-const host=$('viewport');
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x15171a);
-const camera=new THREE.PerspectiveCamera(50,1,.01,2000);camera.position.set(5,4,7);
-const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true;controls.dampingFactor=.08;controls.enablePan=true;controls.screenSpacePanning=true;
-controls.rotateSpeed=.72;controls.panSpeed=.8;controls.zoomSpeed=.9;controls.minDistance=.5;controls.maxDistance=100;
-controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};controls.target.set(0,1,0);controls.update();
-scene.add(new THREE.GridHelper(20,40,0x69747e,0x30363d),new THREE.AxesHelper(2));
-scene.add(new THREE.HemisphereLight(0xffffff,0x30343a,2.1));
-const key=new THREE.DirectionalLight(0xffffff,2.5);key.position.set(4,7,5);scene.add(key);
-const body=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.2,1.1),new THREE.MeshStandardMaterial({color:0x70808d,roughness:.72}));body.position.y=1.1;scene.add(body);
-const head=new THREE.Mesh(new THREE.SphereGeometry(.72,24,16),new THREE.MeshStandardMaterial({color:0x9aa6b0,roughness:.68}));head.position.y=2.65;scene.add(head);
-let gizmo=null;try{gizmo=new ViewportGizmo(camera,renderer,{type:'sphere',size:128,placement:'top-right',offset:{top:58,right:12},animated:true,speed:1.4,lineWidth:2});gizmo.attachControls(controls);gizmo.target.copy(controls.target);gizmo.update()}catch(e){console.warn(e)}
-function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(gizmo)gizmo.update()}
-new ResizeObserver(resize).observe(host);resize();
-function frame(){controls.update();if(gizmo){gizmo.target.copy(controls.target)}renderer.render(scene,camera);if(gizmo)gizmo.render();requestAnimationFrame(frame)}
-requestAnimationFrame(frame);
+ const host=$('viewport'),scene=new THREE.Scene();scene.background=new THREE.Color(0x15171a);const camera=new THREE.PerspectiveCamera(50,1,.01,2000);camera.position.set(5,4,7);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.08;controls.enablePan=true;controls.screenSpacePanning=true;controls.rotateSpeed=.72;controls.panSpeed=.8;controls.zoomSpeed=.9;controls.minDistance=.5;controls.maxDistance=100;controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};controls.target.set(0,1,0);controls.update();scene.add(new THREE.GridHelper(20,40,0x69747e,0x30363d),new THREE.AxesHelper(2));scene.add(new THREE.HemisphereLight(0xffffff,0x30343a,2.1));const key=new THREE.DirectionalLight(0xffffff,2.5);key.position.set(4,7,5);scene.add(key);const body=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.2,1.1),new THREE.MeshStandardMaterial({color:0x70808d,roughness:.72}));body.position.y=1.1;scene.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.72,24,16),new THREE.MeshStandardMaterial({color:0x9aa6b0,roughness:.68}));head.position.y=2.65;scene.add(head);let gizmo=null;try{gizmo=new ViewportGizmo(camera,renderer,{type:'sphere',size:128,placement:'top-right',offset:{top:58,right:12},animated:true,speed:1.4,lineWidth:2});gizmo.attachControls(controls);gizmo.target.copy(controls.target);gizmo.update()}catch(e){console.warn(e)}function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(gizmo)gizmo.update()}new ResizeObserver(resize).observe(host);resize();function frame(){controls.update();if(gizmo)gizmo.target.copy(controls.target);renderer.render(scene,camera);if(gizmo)gizmo.render();requestAnimationFrame(frame)}requestAnimationFrame(frame)
 }catch(e){showError(e)}
-
 try{
-  sounds=await store.listSounds();
-  const saved=await store.getProject();
-  if(saved?.name)$('openProject').previousElementSibling.querySelector('b').textContent=saved.name;
-  refreshSounds();
-  buildTimeline();
-  status.textContent='Ready';
+ let projects=await store.listProjects();
+ if(!projects.length){currentProject=await store.createProject('Untitled Project')}
+ else {const active=await store.getProject();currentProject=active||projects[0];await store.openProject(currentProject.id)}
+ $('projectTitle').textContent=currentProject.name;sounds=await store.listSounds('SFX');refreshSounds();buildTimeline();await renderProjects();status.textContent='Ready'
 }catch(e){showError(e)}
-</script>
-</body>
-</html>
+</script></body></html>
