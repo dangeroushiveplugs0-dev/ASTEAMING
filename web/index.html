@@ -1,0 +1,42 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;touch-action:none}#viewport{position:fixed;inset:0}canvas{display:block;width:100%;height:100%;touch-action:none}</style></head><body><div id="viewport"></div><script type="importmap">{"imports":{"three":"./libs/three/build/three.module.js","three/addons/":"./libs/three/examples/jsm/","three-viewport-gizmo":"./libs/three-viewport-gizmo/dist/three-viewport-gizmo.js"}}</script><script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { ViewportGizmo } from 'three-viewport-gizmo';
+
+const host=document.getElementById('viewport');
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x15171a);
+const camera=new THREE.PerspectiveCamera(50,1,0.01,2000);
+camera.position.set(4,3,6);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+host.appendChild(renderer.domElement);
+
+const controls=new OrbitControls(camera,renderer.domElement);
+controls.enableDamping=true; controls.dampingFactor=.08;
+controls.enablePan=true; controls.screenSpacePanning=true;
+controls.rotateSpeed=.72; controls.panSpeed=.8; controls.zoomSpeed=.9;
+controls.minDistance=.25; controls.maxDistance=100;
+controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};
+controls.target.set(0,1,0); controls.update();
+
+const gizmo=new ViewportGizmo(camera,renderer,{type:'sphere',size:112,placement:'top-right',offset:{top:14,right:14},animated:true,speed:1.4,sphere:{enabled:false},lineWidth:2});
+gizmo.attachControls(controls); gizmo.target.copy(controls.target);
+
+const grid=new THREE.GridHelper(20,20,0x394047,0x252a2f);
+grid.position.y=0; scene.add(grid);
+const axes=new THREE.AxesHelper(1.5); scene.add(axes);
+const light=new THREE.HemisphereLight(0xffffff,0x30343a,2.1); scene.add(light);
+const key=new THREE.DirectionalLight(0xffffff,2.5); key.position.set(4,7,5); scene.add(key);
+
+const body=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.2,1.1),new THREE.MeshStandardMaterial({color:0x68727d,roughness:.72,metalness:.05}));
+body.position.y=1.1; scene.add(body);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.72,24,16),new THREE.MeshStandardMaterial({color:0x89939e,roughness:.68}));
+head.position.y=2.65; scene.add(head);
+
+function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();gizmo.update();}
+new ResizeObserver(resize).observe(host); resize();
+function frame(){controls.update();gizmo.target.copy(controls.target);renderer.render(scene,camera);gizmo.render();requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></body></html>
