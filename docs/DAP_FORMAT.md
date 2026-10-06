@@ -236,3 +236,17 @@ DAP must not become a giant custom replacement for glTF.
 Use glTF/GLB for things glTF already handles well.
 
 Use DAP only for ASTEAMING-specific character organization, customization and physics metadata.
+
+
+## Import resilience and graceful degradation
+
+DAP import is capability-based, not requirement-based. A valid DAP file does not need ASTEAMING-specific metadata to be importable. The importer must inspect the data actually present and independently import every valid component it can recover.
+
+- A DAP containing only standard GLB/glTF data remains importable.
+- Mesh geometry is the minimum practical recovery target. If valid mesh data exists, missing textures, materials, armatures, morph targets, outfits, animations, or physics must not prevent mesh import.
+- Missing textures must fall back to an untextured material or other safe material representation rather than aborting the model import.
+- Missing DAP extension data means the corresponding ASTEAMING features simply do not exist for that asset. The importer must not synthesize fake outfits, shape controls, physics, or bones merely because they are absent.
+- Unknown DAP extension fields or future optional fields are ignored safely.
+- Import errors should be scoped to the smallest affected resource. A broken optional texture should not invalidate otherwise valid mesh data.
+- Recoverable omissions are reported separately from fatal container or structural errors.
+- DAP-specific metadata is an enhancement layer over the GLB-compatible core, never a gate that determines whether the model can be opened.
