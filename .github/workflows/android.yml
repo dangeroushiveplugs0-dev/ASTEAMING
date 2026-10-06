@@ -22,7 +22,13 @@ jobs:
       - name: Bundle web libraries
         run: bash scripts/prepare_web_assets.sh
       - name: Build APK
-        run: gradle :app:assembleDebug --no-daemon
+        run: set -o pipefail; gradle :app:assembleDebug --no-daemon --stacktrace 2>&1 | tee build.log
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ASTEAMING-build-log
+          path: build.log
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
