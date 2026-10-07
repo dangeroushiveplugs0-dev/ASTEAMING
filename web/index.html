@@ -7,7 +7,7 @@
 *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111317;color:#fff;font-family:system-ui,-apple-system,sans-serif;touch-action:none}
 button{font:inherit;color:inherit;background:#252a31;border:1px solid #3a414b;border-radius:8px;padding:9px 12px}button:active{transform:scale(.98)}
 #viewport{position:fixed;inset:0 0 210px}canvas{display:block;width:100%;height:100%;touch-action:none}
-#topbar{position:fixed;left:0;right:0;top:0;height:48px;display:flex;align-items:center;gap:8px;padding:6px 9px;background:rgba(16,18,22,.88);z-index:20;backdrop-filter:blur(10px)}#topbar .title{font-weight:700;margin-right:auto}
+#topbar{position:fixed;left:0;right:0;top:0;height:48px;display:flex;align-items:center;gap:8px;padding:6px 9px;background:rgba(16,18,22,.88);z-index:20;backdrop-filter:blur(10px)}#topbar .title{font-weight:700;margin-right:auto}#importBtn{font-weight:700}#modelInput{display:none}
 #timeline{position:fixed;left:0;right:0;bottom:0;height:210px;background:#171a1f;border-top:1px solid #303640;z-index:30;display:flex;flex-direction:column}
 #timelineHead{height:42px;display:flex;align-items:center;gap:6px;padding:5px 8px;border-bottom:1px solid #303640}#timecode{font-variant-numeric:tabular-nums;min-width:86px;text-align:center}
 #timelineBody{position:relative;display:flex;flex:1;min-height:0;overflow:hidden}#tracks{width:118px;flex:none;background:#1d2127;border-right:1px solid #303640;padding-top:27px}.trackLabel{height:40px;padding:10px 8px;border-bottom:1px solid #2b3038;font-size:12px;white-space:nowrap;overflow:hidden}
@@ -21,7 +21,7 @@ button{font:inherit;color:inherit;background:#252a31;border:1px solid #3a414b;bo
 </style>
 </head>
 <body>
-<div id="topbar"><div id="projectTitle" class="title">Untitled Project</div><button id="soundsBtn">Sounds</button></div>
+<div id="topbar"><div id="projectTitle" class="title">Untitled Project</div><button id="importBtn">＋ Import</button><input id="modelInput" type="file" accept=".glb,.gltf,.obj,.fbx,model/gltf-binary,model/gltf+json,text/plain" multiple><button id="soundsBtn">Sounds</button></div>
 <div id="viewport"></div>
 <div id="soundPanel">
   <b>Project / Sounds</b>
@@ -36,6 +36,9 @@ button{font:inherit;color:inherit;background:#252a31;border:1px solid #3a414b;bo
 import * as THREE from 'three';
 import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
 import {ViewportGizmo} from 'three-viewport-gizmo';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {OBJLoader} from 'three/addons/loaders/OBJLoader.js';
+import {FBXLoader} from 'three/addons/loaders/FBXLoader.js';
 import {ProjectStore} from './src/asteaming/project/ProjectStore.js';
 import {AudioEngine} from './src/asteaming/audio/AudioEngine.js';
 import {TimelineModel} from './src/asteaming/timeline/TimelineModel.js';
@@ -60,6 +63,7 @@ function refreshSounds(){
  for(const sound of sounds){const row=document.createElement('div');row.className='soundItem';const name=document.createElement('span');name.textContent=sound.name;const add=document.createElement('button');add.textContent='Add to timeline';add.onclick=()=>{const track=audioTimeline.tracks[0]||audioTimeline.addTrack();const clip=audioTimeline.addClip(track,sound,timeline.current,{duration:sound.duration||5});const modelTrack=timeline.tracks.find(t=>t.kind==='audio');modelTrack.clips=modelTrack.clips||[];modelTrack.clips.push(clip);timeline.end=Math.max(timeline.end,timeline.current+clip.duration+1);buildTimeline()};row.append(name,add);$('soundList').appendChild(row)}
 }
 $('soundsBtn').onclick=()=>{$('soundPanel').style.display=$('soundPanel').style.display==='none'?'block':'none'};
+$('importBtn').onclick=()=>$('modelInput').click();
 $('addSound').onclick=()=>$('soundInput').click();
 $('soundInput').onchange=async e=>{try{if(!currentProject)throw new Error('Open a project first');for(const file of e.target.files||[])sounds.push(await store.putSound(file,file.name,'SFX'));refreshSounds();$('soundPanel').style.display='block';e.target.value=''}catch(err){showError(err)}};
 $('play').onclick=()=>controller.togglePlay();$('stop').onclick=()=>{controller.pause();controller.setTime(timeline.start)};$('prev').onclick=()=>controller.setTime(Math.max(timeline.start,timeline.current-1/30));$('next').onclick=()=>controller.setTime(Math.min(timeline.end,timeline.current+1/30));
@@ -67,7 +71,19 @@ $('timelineScroll').addEventListener('pointerdown',e=>{const r=$('timelineScroll
 $('timelineScroll').addEventListener('pointermove',e=>{if(e.buttons){const r=$('timelineScroll').getBoundingClientRect();controller.setTime(Math.max(0,(e.clientX-r.left+e.currentTarget.scrollLeft)/90))}});
 try{
  const projects=await store.listProjects(); currentProject=projects.length?await store.openProject(projects[0].id):await store.createProject('Untitled Project'); $('projectTitle').textContent=currentProject.name; sounds=await store.listSounds('SFX'); refreshSounds();
- const host=$('viewport'),scene=new THREE.Scene();scene.background=new THREE.Color(0x15171a);const camera=new THREE.PerspectiveCamera(50,1,.01,2000);camera.position.set(5,4,7);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.08;controls.enablePan=true;controls.screenSpacePanning=true;controls.rotateSpeed=.72;controls.panSpeed=.8;controls.zoomSpeed=.9;controls.minDistance=.5;controls.maxDistance=100;controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};controls.target.set(0,1,0);controls.update();scene.add(new THREE.GridHelper(20,40,0x69747e,0x30363d),new THREE.AxesHelper(2));scene.add(new THREE.HemisphereLight(0xffffff,0x30343a,2.1));const key=new THREE.DirectionalLight(0xffffff,2.5);key.position.set(4,7,5);scene.add(key);const body=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.2,1.1),new THREE.MeshStandardMaterial({color:0x70808d,roughness:.72}));body.position.y=1.1;scene.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.72,24,16),new THREE.MeshStandardMaterial({color:0x9aa6b0,roughness:.68}));head.position.y=2.65;scene.add(head);let gizmo=null;try{gizmo=new ViewportGizmo(camera,renderer,{type:'sphere',size:128,placement:'top-right',offset:{top:58,right:12},animated:true,speed:1.4,lineWidth:2});gizmo.attachControls(controls);gizmo.target.copy(controls.target);gizmo.update()}catch(e){console.warn(e)}function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(gizmo)gizmo.update()}new ResizeObserver(resize).observe(host);resize();function frame(){controls.update();if(gizmo)gizmo.target.copy(controls.target);renderer.render(scene,camera);if(gizmo)gizmo.render();requestAnimationFrame(frame)}requestAnimationFrame(frame)
+ const host=$('viewport'),scene=new THREE.Scene();scene.background=new THREE.Color(0x15171a);const camera=new THREE.PerspectiveCamera(50,1,.01,2000);camera.position.set(5,4,7);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.08;controls.enablePan=true;controls.screenSpacePanning=true;controls.rotateSpeed=.72;controls.panSpeed=.8;controls.zoomSpeed=.9;controls.minDistance=.5;controls.maxDistance=100;controls.touches={ONE:THREE.TOUCH.ROTATE,TWO:THREE.TOUCH.DOLLY_PAN};controls.target.set(0,1,0);controls.update();scene.add(new THREE.GridHelper(20,40,0x69747e,0x30363d),new THREE.AxesHelper(2));scene.add(new THREE.HemisphereLight(0xffffff,0x30343a,2.1));const key=new THREE.DirectionalLight(0xffffff,2.5);key.position.set(4,7,5);scene.add(key);const placeholder=new THREE.Group();const body=new THREE.Mesh(new THREE.BoxGeometry(1.8,2.2,1.1),new THREE.MeshStandardMaterial({color:0x70808d,roughness:.72}));body.position.y=1.1;placeholder.add(body);const head=new THREE.Mesh(new THREE.SphereGeometry(.72,24,16),new THREE.MeshStandardMaterial({color:0x9aa6b0,roughness:.68}));head.position.y=2.65;placeholder.add(head);scene.add(placeholder);
+let importedRoot=null;
+function clearImported(){if(importedRoot){scene.remove(importedRoot);importedRoot.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material){const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>{if(m.map)m.map.dispose();m.dispose()})}});importedRoot=null}}
+function frameObject(root){const box=new THREE.Box3().setFromObject(root);if(box.isEmpty())return;const center=box.getCenter(new THREE.Vector3());const size=box.getSize(new THREE.Vector3());const maxDim=Math.max(size.x,size.y,size.z);const distance=maxDim/(2*Math.tan(THREE.MathUtils.degToRad(camera.fov/2)))*1.35;camera.position.copy(center).add(new THREE.Vector3(distance*.8,distance*.55,distance));camera.near=Math.max(.001,maxDim/10000);camera.far=Math.max(2000,maxDim*100);camera.updateProjectionMatrix();controls.target.copy(center);controls.update();if(gizmo){gizmo.target.copy(center);gizmo.update()}}
+async function importModelFiles(files){const file=files[0];if(!file)return;try{status.textContent='Importing '+file.name+'…';status.style.display='block';clearImported();placeholder.visible=false;const ext=file.name.toLowerCase().split('.').pop();let root;
+if(ext==='glb'){root=(await new GLTFLoader().parseAsync(await file.arrayBuffer(),'')).scene;}
+else if(ext==='gltf'){const text=await file.text();const loader=new GLTFLoader();root=(await loader.parseAsync(text,'')).scene;}
+else if(ext==='obj'){root=new OBJLoader().parse(await file.text());}
+else if(ext==='fbx'){root=new FBXLoader().parse(await file.arrayBuffer(),'');}
+else throw new Error('Unsupported model format');
+importedRoot=root;scene.add(root);root.traverse(o=>{if(o.isMesh){o.frustumCulled=true;o.castShadow=false;o.receiveShadow=true}});frameObject(root);status.textContent='Imported: '+file.name;setTimeout(()=>status.style.display='none',1400);
+}catch(e){placeholder.visible=true;showError(e)}}
+$('modelInput').onchange=e=>{importModelFiles(e.target.files);e.target.value=''};let gizmo=null;try{gizmo=new ViewportGizmo(camera,renderer,{type:'sphere',size:128,placement:'top-right',offset:{top:58,right:12},animated:true,speed:1.4,lineWidth:2});gizmo.attachControls(controls);gizmo.target.copy(controls.target);gizmo.update()}catch(e){console.warn(e)}function resize(){const w=host.clientWidth,h=host.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();if(gizmo)gizmo.update()}new ResizeObserver(resize).observe(host);resize();function frame(){controls.update();if(gizmo)gizmo.target.copy(controls.target);renderer.render(scene,camera);if(gizmo)gizmo.render();requestAnimationFrame(frame)}requestAnimationFrame(frame)
 }catch(e){showError(e)}
 try{
  let projects=await store.listProjects();
